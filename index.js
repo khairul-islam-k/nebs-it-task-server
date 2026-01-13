@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 var cors = require('cors');
 const port = process.env.PORT || 5000;
@@ -28,9 +28,23 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     const nebsCollection = client.db('nebsTaskDb').collection('publishNotice');
-
+// all notice
     app.get("/notices", async (req, res) => {
       const result = await nebsCollection.find().toArray();
+      res.send(result);
+    })
+
+
+    // notice update
+    app.patch("/notices/:id", async (req, res) => {
+      const {id} = req.params;
+      const filter = {_id: new ObjectId(id)};
+      const data = req.body;
+      const updateDoc = {
+        $set: data
+      }
+
+      const result = await nebsCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
 
