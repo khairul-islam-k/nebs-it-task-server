@@ -28,12 +28,20 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     const nebsCollection = client.db('nebsTaskDb').collection('publishNotice');
+    
 // all notice
     app.get("/notices", async (req, res) => {
       const result = await nebsCollection.find().toArray();
       res.send(result);
     })
 
+    // single notice 
+    app.get("/notices/:id", async (req, res) => {
+      const {id} = req.params;
+      const filter = {_id: new ObjectId(id)};
+      const result = await nebsCollection.findOne(filter);
+      res.send(result);
+    })
 
     // notice update
     app.patch("/notices/:id", async (req, res) => {
