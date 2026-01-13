@@ -28,11 +28,25 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     const nebsCollection = client.db('nebsTaskDb').collection('publishNotice');
-    
+
 // all notice
     app.get("/notices", async (req, res) => {
       const result = await nebsCollection.find().toArray();
       res.send(result);
+    })
+
+
+    app.get("/notice6", async (req, res) => {
+      const page = parseInt(req.query.page) || 0;
+      const size = parseInt(req.query.size) || 6;
+
+      const result = await nebsCollection.find()
+          .sort({ createdAt: -1 })
+          .skip(page * size)
+          .limit(size)
+          .toArray();
+
+          res.send(result);
     })
 
     // single notice 
@@ -40,6 +54,12 @@ async function run() {
       const {id} = req.params;
       const filter = {_id: new ObjectId(id)};
       const result = await nebsCollection.findOne(filter);
+      res.send(result);
+    })
+
+    // Draft notice
+    app.get("/draft", async (req, res) => {
+      const result = await nebsCollection.find({status: "Draft"}).toArray();
       res.send(result);
     })
 
